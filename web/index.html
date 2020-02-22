@@ -1,0 +1,250 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1">
+        <script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.0.0-beta.35/dist/web3.min.js"></script>
+        <script>
+
+        //ABI del contrato ClaimHolder
+	    const ABI_CH = [{"constant": false,"inputs": [{"name": "_claimType","type": "uint256"},{"name": "_scheme","type": "uint256"},{"name": "_issuer","type": "address"},{"name": "_signature","type": "bytes"},{"name": "_data","type": "bytes"},{"name": "_uri","type": "string"}],"name": "addClaim","outputs": [{"name": "claimRequestId","type": "bytes32"}],"payable": false,"stateMutability": "nonpayable","type": "function"},{"constant": false,"inputs": [{"name": "_key","type": "bytes32"},{"name": "_purpose","type": "uint256"},{"name": "_type","type": "uint256"}],"name": "addKey","outputs": [{"name": "success","type": "bool"}],"payable": false,"stateMutability": "nonpayable","type": "function"},{"constant": false,"inputs": [{"name": "_id","type": "uint256"},{"name": "_approve","type": "bool"}],"name": "approve","outputs": [{"name": "success","type": "bool"}],"payable": false,"stateMutability": "nonpayable","type": "function"},{"anonymous": false,"inputs": [{"indexed": true,"name": "claimRequestId","type": "uint256"},{"indexed": true,"name": "claimType","type": "uint256"},{"indexed": false,"name": "scheme","type": "uint256"},{"indexed": true,"name": "issuer","type": "address"},{"indexed": false,"name": "signature","type": "bytes"},{"indexed": false,"name": "data","type": "bytes"},{"indexed": false,"name": "uri","type": "string"}],"name": "ClaimRequested","type": "event"},{"anonymous": false,"inputs": [{"indexed": true,"name": "claimId","type": "bytes32"},{"indexed": true,"name": "claimType","type": "uint256"},{"indexed": true,"name": "issuer","type": "address"},{"indexed": false,"name": "signatureType","type": "uint256"},{"indexed": false,"name": "signature","type": "bytes32"},{"indexed": false,"name": "claim","type": "bytes"},{"indexed": false,"name": "uri","type": "string"}],"name": "ClaimAdded","type": "event"},{"anonymous": false,"inputs": [{"indexed": true,"name": "claimId","type": "bytes32"},{"indexed": true,"name": "claimType","type": "uint256"},{"indexed": false,"name": "scheme","type": "uint256"},{"indexed": true,"name": "issuer","type": "address"},{"indexed": false,"name": "signature","type": "bytes"},{"indexed": false,"name": "data","type": "bytes"},{"indexed": false,"name": "uri","type": "string"}],"name": "ClaimAdded","type": "event"},{"anonymous": false,"inputs": [{"indexed": true,"name": "claimId","type": "bytes32"},{"indexed": true,"name": "claimType","type": "uint256"},{"indexed": false,"name": "scheme","type": "uint256"},{"indexed": true,"name": "issuer","type": "address"},{"indexed": false,"name": "signature","type": "bytes"},{"indexed": false,"name": "data","type": "bytes"},{"indexed": false,"name": "uri","type": "string"}],"name": "ClaimRemoved","type": "event"},{"anonymous": false,"inputs": [{"indexed": true,"name": "claimId","type": "bytes32"},{"indexed": true,"name": "claimType","type": "uint256"},{"indexed": false,"name": "scheme","type": "uint256"},{"indexed": true,"name": "issuer","type": "address"},{"indexed": false,"name": "signature","type": "bytes"},{"indexed": false,"name": "data","type": "bytes"},{"indexed": false,"name": "uri","type": "string"}],"name": "ClaimChanged","type": "event"},{"constant": false,"inputs": [{"name": "_to","type": "address"},{"name": "_value","type": "uint256"},{"name": "_data","type": "bytes"}],"name": "execute","outputs": [{"name": "executionId","type": "uint256"}],"payable": false,"stateMutability": "nonpayable","type": "function"},{"anonymous": false,"inputs": [{"indexed": true,"name": "executionId","type": "uint256"},{"indexed": true,"name": "to","type": "address"},{"indexed": true,"name": "value","type": "uint256"},{"indexed": false,"name": "data","type": "bytes"}],"name": "ExecutionFailed","type": "event"},{"anonymous": false,"inputs": [{"indexed": true,"name": "key","type": "bytes32"},{"indexed": true,"name": "purpose","type": "uint256"},{"indexed": true,"name": "keyType","type": "uint256"}],"name": "KeyAdded","type": "event"},{"anonymous": false,"inputs": [{"indexed": true,"name": "key","type": "bytes32"},{"indexed": true,"name": "purpose","type": "uint256"},{"indexed": true,"name": "keyType","type": "uint256"}],"name": "KeyRemoved","type": "event"},{"anonymous": false,"inputs": [{"indexed": true,"name": "executionId","type": "uint256"},{"indexed": true,"name": "to","type": "address"},{"indexed": true,"name": "value","type": "uint256"},{"indexed": false,"name": "data","type": "bytes"}],"name": "ExecutionRequested","type": "event"},{"anonymous": false,"inputs": [{"indexed": true,"name": "executionId","type": "uint256"},{"indexed": true,"name": "to","type": "address"},{"indexed": true,"name": "value","type": "uint256"},{"indexed": false,"name": "data","type": "bytes"}],"name": "Executed","type": "event"},{"anonymous": false,"inputs": [{"indexed": true,"name": "executionId","type": "uint256"},{"indexed": false,"name": "approved","type": "bool"}],"name": "Approved","type": "event"},{"constant": false,"inputs": [{"name": "_claimId","type": "bytes32"}],"name": "removeClaim","outputs": [{"name": "success","type": "bool"}],"payable": false,"stateMutability": "nonpayable","type": "function"},{"constant": false,"inputs": [{"name": "_key","type": "bytes32"}],"name": "removeKey","outputs": [{"name": "success","type": "bool"}],"payable": false,"stateMutability": "nonpayable","type": "function"},{"constant": true,"inputs": [{"name": "_claimId","type": "bytes32"}],"name": "getClaim","outputs": [{"name": "claimType","type": "uint256"},{"name": "scheme","type": "uint256"},{"name": "issuer","type": "address"},{"name": "signature","type": "bytes"},{"name": "data","type": "bytes"},{"name": "uri","type": "string"}],"payable": false,"stateMutability": "view","type": "function"},{"constant": true,"inputs": [{"name": "_claimType","type": "uint256"}],"name": "getClaimIdsByType","outputs": [{"name": "claimIds","type": "bytes32[]"}],"payable": false,"stateMutability": "view","type": "function"},{"constant": true,"inputs": [{"name": "_key","type": "bytes32"}],"name": "getKey","outputs": [{"name": "purpose","type": "uint256"},{"name": "keyType","type": "uint256"},{"name": "key","type": "bytes32"}],"payable": false,"stateMutability": "view","type": "function"},{"constant": true,"inputs": [{"name": "_key","type": "bytes32"}],"name": "getKeyPurpose","outputs": [{"name": "purpose","type": "uint256"}],"payable": false,"stateMutability": "view","type": "function"},{"constant": true,"inputs": [{"name": "_purpose","type": "uint256"}],"name": "getKeysByPurpose","outputs": [{"name": "_keys","type": "bytes32[]"}],"payable": false,"stateMutability": "view","type": "function"},{"constant": true,"inputs": [{"name": "_key","type": "bytes32"},{"name": "_purpose","type": "uint256"}],"name": "keyHasPurpose","outputs": [{"name": "result","type": "bool"}],"payable": false,"stateMutability": "view","type": "function"}];
+
+        //ABI del contrato ClaimVerifier
+        const ABI_CV = [{"constant": false,"inputs": [{"name": "_identity","type": "address"},{"name": "claimType","type": "uint256"}],"name": "checkClaim","outputs": [{"name": "claimValid","type": "bool"}],"payable": false,"stateMutability": "nonpayable","type": "function"},{"anonymous": false,"inputs": [{"indexed": false,"name": "_identity","type": "address"},{"indexed": false,"name": "claimType","type": "uint256"}],"name": "ClaimValid","type": "event"},{"anonymous": false,"inputs": [{"indexed": false,"name": "_identity","type": "address"},{"indexed": false,"name": "claimType","type": "uint256"}],"name": "ClaimInvalid","type": "event"},{"inputs": [{"name": "_trustedClaimHolder","type": "address"}],"payable": false,"stateMutability": "nonpayable","type": "constructor"},{"constant": true,"inputs": [{"name": "_identity","type": "address"},{"name": "claimType","type": "uint256"}],"name": "claimIsValid","outputs": [{"name": "claimValid","type": "bool"}],"payable": false,"stateMutability": "view","type": "function"},{"constant": true,"inputs": [{"name": "sig","type": "bytes"},{"name": "dataHash","type": "bytes32"}],"name": "getRecoveredAddress","outputs": [{"name": "addr","type": "address"}],"payable": false,"stateMutability": "view","type": "function"},{"constant": true,"inputs": [],"name": "trustedClaimHolder","outputs": [{"name": "","type": "address"}],"payable": false,"stateMutability": "view","type": "function"}];
+
+        //Variables
+        //Contratos
+        var contrato_alumno = "0x2AE4c2160d1CbaFF3F8B07B3A0Ca51243931a4eb";
+        var contrato_uni = "0xB53A5E4E0F38f281A6f0bEC0D3534eA9C7be3FA9";
+        var contrato_empresa = "0xD1D41d9E881e302F3fA9AeA6E26f70e3EA6F4640";
+
+        //Se instancia el objeto web3
+        var web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:7545"));
+
+        var cuentaAlumno, cuentaUni, cuentaEmpresa, cuentaUniClaim, instanciaAlumno, instanciaUni, instanciaEmpresa;
+
+        var executionId_alumno;
+
+        async function start() {
+            // Gett all the accounts
+            const accounts = await web3.eth.getAccounts();
+
+            //Cuentas
+            cuentaAlumno = accounts[0];
+            cuentaUni = accounts[1];
+            cuentaEmpresa = accounts[2];
+
+            cuentaUniClaim = accounts[3];
+            document.getElementById('clave').value = cuentaUniClaim;
+
+            //Recuperamos el contrato
+            instanciaAlumno = new web3.eth.Contract(ABI_CH, contrato_alumno);
+               // Get Universidad (ClaimUser) smart contract instance object
+            instanciaUni = new web3.eth.Contract(ABI_CH, contrato_uni);
+               // Get Empresa (ClaimVerifier) smart contract instance object
+            instanciaEmpresa = new web3.eth.Contract(ABI_CV, contrato_empresa);
+        }
+
+        start();
+
+		//Clave para alumno
+        function getKeyByPurposeAlumno(purpose)
+        {
+			instanciaAlumno.methods.getKeysByPurpose(parseInt(purpose)).call( {from: cuentaAlumno, gas: 30000}, function(error, result){
+                  if(!error){
+                      console.log(result);
+                      document.getElementById('console').innerHTML = document.getElementById('console').innerHTML+"<br>"+result;
+                  }
+                  else
+                      console.error(error);
+                });
+        }
+
+         //Añadir clave a la universidad para firmar alegaciones (addKey)
+        async function addkeyUniversidad(key, purpose, type)
+        {
+            //Usar la función instanciaUni.methods.addKey() de tipo CLAIM
+            var cuentaUniClaimKey = web3.utils.keccak256(cuentaUniClaim);
+
+            // 3: KEY_PURPOSE_CLAIM
+            // 1: KEY_TYPE_ECDSA           
+            await instanciaUni.methods.addKey(cuentaUniClaimKey, 3, 1)
+                .send({from: cuentaUni, gas: 3000000}, function(error, result){
+                    if (!error) {
+
+                        document.getElementById('console').innerHTML = document.getElementById('console').innerHTML+"<br><br>Tx ok: "+result;
+                    } else{
+                        console.log(error);
+                    }
+                })
+                .on('receipt', function(receipt){
+
+                    if (receipt.events) {
+                        console.log(JSON.stringify(receipt.events, null, 2));
+
+                        if (receipt.events.KeyAdded) {
+                            document.getElementById('console').innerHTML = document.getElementById('console').innerHTML+"<br>KeyAdded, key = " + receipt.events.KeyAdded.returnValues.key;
+                        }
+                    }
+            });               
+            
+        }
+
+
+        //Añadir alegación desde la universidad en el contrato de identidad del Alumno (addClaim)		
+        async function addClaimUniAlumno(alegacion)
+        {
+        
+            // Obtenemos la firma de la alegación (clain) desde la universidad
+            var hexedData = web3.utils.asciiToHex(alegacion);            
+            var hashedDataToSign = web3.utils.soliditySha3(contrato_alumno, 1, hexedData);
+            var signature = await web3.eth.sign(hashedDataToSign, cuentaUniClaim);
+
+            //Obtener Abi de instanciaAlumno.methods.addClaim()     
+            var addClaimABI = instanciaAlumno.methods.addClaim(
+                1, // 1: Certificado academico
+                1, // 2: ECDSA
+                contrato_uni,
+                signature,
+                hexedData,
+                "htts://www.unir.net"
+            ).encodeABI();
+           
+            //Usar la función instanciaAlumno.methods.execute()
+            instanciaAlumno.methods.execute(instanciaAlumno.options.address, 0, addClaimABI)
+                .send({from: cuentaUni, gas: 3000000}, function(error, result){
+                    if (!error) {
+                        
+                        document.getElementById('console').innerHTML = document.getElementById('console').innerHTML+"<br><br>Tx ok: "+result;
+                    } else{
+                        console.log(error);
+                    }
+                }).on('receipt', function(receipt){
+
+                    if (receipt.events) {
+                        console.log(JSON.stringify(receipt.events, null, 2));
+
+                        if (receipt.events.ExecutionRequested) {
+                            executionId_alumno = receipt.events.ExecutionRequested.returnValues.executionId;
+                            document.getElementById('console').innerHTML = 
+                                document.getElementById('console').innerHTML+"<br>ExecutionRequested, executionId = " + receipt.events.ExecutionRequested.returnValues.executionId;
+                        }
+                    }          
+
+            });        
+        }
+
+        //Aprobar la alegación añadida por la universidad al Alumno (approve), ya que la Universidad la ha expedido pero el alumno debe aprobarla	
+        //function approveUniAlumno(id)
+        async function approveUniAlumno()
+        {
+            //Usar la función instanciaAlumno.methods.approve()
+            instanciaAlumno.methods.approve(executionId_alumno, true)
+                .send({from: cuentaAlumno, gas: 3000000}, function(error, result){
+                    if (!error) {
+                        
+                        document.getElementById('console').innerHTML = document.getElementById('console').innerHTML+"<br><br>Tx ok: "+result;
+                    } else{
+                        console.log(error);
+                    }
+                }).on('receipt', function(receipt){
+
+                    if (receipt.events) {
+                        console.log(JSON.stringify(receipt.events, null, 2));
+
+                        if (receipt.events.Approved) {
+                          
+                            document.getElementById('console').innerHTML = 
+                                document.getElementById('console').innerHTML+"<br>Approved = " + receipt.events.Approved.returnValues.approved;
+                        }
+
+                        if (receipt.events.ClaimAdded) {
+                          
+                            document.getElementById('console').innerHTML = 
+                                document.getElementById('console').innerHTML+"<br>ClaimAdded, claimId = " + receipt.events.ClaimAdded.returnValues.claimId;
+                        }
+
+                        if (receipt.events.Executed) {
+                            
+                            document.getElementById('console').innerHTML = 
+                                document.getElementById('console').innerHTML+"<br>Executed";
+                        }
+                    }   
+
+            });    
+            
+        }	
+
+       //Verificar la alegación por parte de la empresa (checkClaim) de que el alumno tiene ese claim y es válido y está aprobado
+        async function verifierUniAlumno(tipoClaim)         
+        {
+            //Usar la función  instanciaEmpresa.methods.checkClaim()
+            instanciaEmpresa.methods.checkClaim(contrato_alumno, parseInt(1))
+                .send({from: cuentaEmpresa, gas: 3000000}, function(error, result){
+                    if (!error) {
+                        
+                        document.getElementById('console').innerHTML = document.getElementById('console').innerHTML+"<br><br>Tx ok: "+result;
+                    } else{
+                        console.log(error);
+                    }
+                }).on('receipt', function(receipt){
+
+                    if (receipt.events) {
+                        console.log(JSON.stringify(receipt.events, null, 2));
+                       
+                        if (receipt.events.ClaimValid) {
+                            
+                            document.getElementById('console').innerHTML = 
+                                document.getElementById('console').innerHTML+"<br>ClaimValid";
+                        }
+                    }   
+            });             
+        }				
+			
+        </script>
+    </head>
+    <body>
+      <form name="identidad">
+            <table>
+                <tr>
+                    <td>
+                        <input type="button" name="getKeyByPurpose_Alumno" value="getKeyByPurpose_Alumno" onclick="getKeyByPurposeAlumno(identidad.purpose.value)"><br>
+					</td>
+					<td>
+					    <input type="text" name="Proposito" id="purpose">
+					</td>
+                </tr>
+				<tr>					
+					<td>
+                        <input type="button" name="addkey_Uni" value="addkey_Uni" onclick="addkeyUniversidad(identidad.clave.value,1,1)"><br>
+					</td>
+					<td><input type="text" name="clave" id="clave"><br></td>
+                </tr>
+				<tr>					
+					<td >
+                        A&ntilde;ade claim: <input type="button" name="aniadirclaim" value="a&ntilde;adir" onclick="addClaimUniAlumno(identidad.addclaimAlumno.value)">
+					</td>
+					<td>
+						<input type="text" name="addclaimAlumno" value="Posee certificado Experto Universitario en Desarrollo de Aplicaciones Blockchain"><br>
+					</td>
+                </tr>
+				<tr>			
+					<td colspan="2">
+                    <!--<input type="button" name="approval_unialumno" value="approval_unialumno" onclick="approveunialumno(response.events.ExecutionRequested.returnValues.executionId)">-->
+                    <input type="button" name="approval_unialumno" value="approval_unialumno" onclick="approveUniAlumno()">
+					</td>
+                </tr>
+				<tr>
+					<td>
+					<input type="button" name="verifier_unialumno" value="verifier_unialumno" onclick="verifierUniAlumno(identidad.tipoclaim.value)">
+                    </td>
+                    <td>
+                       <input type="text" name="tipoclaim" id="tipoclaim">
+                    </td>
+                </tr>
+            </table>
+        </form>
+
+      <div id="console"></div>
+    </body>
+</html>
+
+
